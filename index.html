@@ -19,16 +19,24 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
-        /* All styles are now scoped to the .monitoring-dashboard-container class */
-        .monitoring-dashboard-container {
+        body, html {
+            height: 100%;
+            margin: 0;
+            overflow: hidden; /* Prevent body scrolling */
+        }
+
+        body {
             font-family: 'Inter', sans-serif;
             background-color: #f0f0f0;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
+        }
+
+        #root {
             height: 100%;
         }
 
-        .monitoring-dashboard-container {
+        :root {
             --bg-main: #f0f0f0;
             --bg-content: #ffffff;
             --bg-secondary: #f8f9fa;
@@ -43,17 +51,18 @@
             --error-bg-light: #ffebee;
         }
 
-        .monitoring-dashboard-container .table-container::-webkit-scrollbar, .monitoring-dashboard-container .charts-container::-webkit-scrollbar { width: 8px; height: 8px; }
-        .monitoring-dashboard-container .table-container::-webkit-scrollbar-thumb, .monitoring-dashboard-container .charts-container::-webkit-scrollbar-thumb { background-color: #ccc; border-radius: 4px; }
-        .monitoring-dashboard-container .table-container::-webkit-scrollbar-track, .monitoring-dashboard-container .charts-container::-webkit-scrollbar-track { background-color: #f1f1f1; }
+        .table-container::-webkit-scrollbar, .charts-container::-webkit-scrollbar { width: 8px; height: 8px; }
+        .table-container::-webkit-scrollbar-thumb, .charts-container::-webkit-scrollbar-thumb { background-color: #ccc; border-radius: 4px; }
+        .table-container::-webkit-scrollbar-track, .charts-container::-webkit-scrollbar-track { background-color: #f1f1f1; }
 
-        .monitoring-dashboard-container .checkbox-group { display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; }
-        .monitoring-dashboard-container .checkbox-label { display: flex; align-items: center; cursor: pointer; font-size: 0.875rem; font-weight: 500; color: var(--text-primary); }
-        .monitoring-dashboard-container .checkbox-input { appearance: none; -webkit-appearance: none; width: 16px; height: 16px; border: 1px solid var(--border-color); border-radius: 4px; margin-right: 8px; position: relative; cursor: pointer; outline: none; transition: all 0.2s; }
-        .monitoring-dashboard-container .checkbox-input:checked { background-color: var(--accent-blue); border-color: var(--accent-blue); }
-        .monitoring-dashboard-container .checkbox-input:checked::before { content: '✓'; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: white; font-size: 12px; }
+        .checkbox-group { display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; }
+        .checkbox-label { display: flex; align-items: center; cursor: pointer; font-size: 0.875rem; font-weight: 500; color: var(--text-primary); }
+        .checkbox-input { appearance: none; -webkit-appearance: none; width: 16px; height: 16px; border: 1px solid var(--border-color); border-radius: 4px; margin-right: 8px; position: relative; cursor: pointer; outline: none; transition: all 0.2s; }
+        .checkbox-input:checked { background-color: var(--accent-blue); border-color: var(--accent-blue); }
+        .checkbox-input:checked::before { content: '✓'; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: white; font-size: 12px; }
 
-        .monitoring-dashboard-container .loader-container {
+        /* Loading Spinner Styles */
+        .loader-container {
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -64,21 +73,22 @@
             padding: 2rem;
             text-align: center;
         }
-        .monitoring-dashboard-container .spinner {
+        .spinner {
             border: 5px solid rgba(0, 0, 0, 0.1);
             width: 50px;
             height: 50px;
             border-radius: 50%;
             border-left-color: var(--accent-blue);
-            animation: monitoring-dashboard-spin 1s ease infinite;
+            animation: spin 1s ease infinite;
             margin-bottom: 20px;
         }
-        @keyframes monitoring-dashboard-spin {
+        @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
 
-        .monitoring-dashboard-container .modal-overlay {
+        /* Modal Styles */
+        .modal-overlay {
             position: fixed;
             top: 0;
             left: 0;
@@ -90,7 +100,7 @@
             align-items: center;
             z-index: 1000;
         }
-        .monitoring-dashboard-container .modal-content {
+        .modal-content {
             background-color: white;
             padding: 2rem;
             border-radius: 12px;
@@ -99,18 +109,18 @@
             box-shadow: 0 5px 15px rgba(0,0,0,0.3);
             position: relative;
         }
-        .monitoring-dashboard-container .modal-content h2 {
+        .modal-content h2 {
             margin-top: 0;
             color: var(--excel-green);
         }
-        .monitoring-dashboard-container .modal-content ul {
+        .modal-content ul {
             list-style-type: disc;
             padding-left: 20px;
         }
-        .monitoring-dashboard-container .modal-content li {
+        .modal-content li {
             margin-bottom: 10px;
         }
-        .monitoring-dashboard-container .close-button {
+        .close-button {
             position: absolute;
             top: 15px;
             right: 15px;
@@ -120,7 +130,7 @@
             cursor: pointer;
             color: #888;
         }
-        .monitoring-dashboard-container .action-button {
+        .action-button {
             background-color: var(--excel-green);
             color: white;
             border: none;
@@ -130,22 +140,17 @@
             font-weight: 500;
             transition: background-color 0.2s;
         }
-        .monitoring-dashboard-container .action-button:hover {
+        .action-button:hover {
             background-color: #1A4A8A;
         }
     </style>
 </head>
 <body>
-    <!--
-      This is the container for your Softr Custom Code block.
-      The React application will be rendered inside this div.
-    -->
-    <div id="monitoring-dashboard-root">
-        <div class="monitoring-dashboard-container">
-            <div class="loader-container">
-                <div class="spinner"></div>
-                <p>Loading Application...</p>
-            </div>
+    <!-- Main container, initially shows spinner -->
+    <div id="root">
+        <div class="loader-container">
+            <div class="spinner"></div>
+            <p>Loading Application...</p>
         </div>
     </div>
 
@@ -153,12 +158,13 @@
     <script type="text/babel">
         const { useState, useEffect, useCallback, useMemo, useRef } = React;
 
-        // --- IMPORTANT ---
-        // API calls have been removed for security.
-        // Data must now be passed into the App component via props.
-        // In Softr, you will need to use its Airtable integration to fetch
-        // data and pass it to this custom code block.
-        // Example of how data is expected: `window.airtableRecords`
+        // --- Secure API Configuration ---
+        // The API endpoint is now our secure Netlify proxy function.
+        // It's relative to the current domain, so it works on localhost and on Netlify.
+        const PROXY_ENDPOINT = '/.netlify/functions/airtable-proxy';
+        const PROXY_HEADERS = {
+            'Content-Type': 'application/json',
+        };
 
         // --- Data Structure Constants ---
         const MONTHS_2025 = ["January 2025", "February 2025", "March 2025", "April 2025", "May 2025", "June 2025", "July 2025", "August 2025", "September 2025", "October 2025", "November 2025", "December 2025"];
@@ -169,9 +175,6 @@
         const BASE_FIELDS = ['Show Chart', 'Customer/ General meter', 'Meter serial number', 'Meter type', 'Location'];
 
         const analyzeData = (records, threshold, checkZeroError, useYearOverYear) => {
-            if (!records || !Array.isArray(records)) {
-                return [];
-            }
             const deviationThreshold = threshold / 100;
             return records.map(record => {
                 const errors = {};
@@ -180,6 +183,7 @@
                     const currentMonth = ALL_MONTHS[i];
                     const currentValue = record.fields[currentMonth];
 
+                    // --- Part 1: Always calculate consumption based on previous month's index ---
                     if (i > 0) {
                         const previousMonth = ALL_MONTHS[i - 1];
                         const previousValue = record.fields[previousMonth];
@@ -190,15 +194,17 @@
                             calculatedConsumption[currentMonth] = null;
                         }
                     } else {
-                         calculatedConsumption[currentMonth] = 0;
+                         calculatedConsumption[currentMonth] = 0; // Consumption for the first month is 0
                     }
 
+                    // --- Part 2: Determine alarm conditions based on index values ---
                     if (typeof currentValue !== 'number' || isNaN(currentValue)) {
-                        continue;
+                        continue; // Cannot check for errors if current value is not a number.
                     }
 
                     let comparisonValue = null;
 
+                    // Strategy 1: Year-over-year comparison
                     if (useYearOverYear) {
                         const [monthName, yearStr] = currentMonth.split(' ');
                         const year = parseInt(yearStr, 10);
@@ -208,6 +214,7 @@
                         }
                     }
 
+                    // Strategy 2: Month-over-month fallback
                     if (comparisonValue === null && i > 0) {
                          const previousMonth = ALL_MONTHS[i - 1];
                          if (typeof record.fields[previousMonth] === 'number') {
@@ -216,15 +223,16 @@
                     }
 
                     if (comparisonValue === null) {
-                        continue;
+                        continue; // No valid comparison value found
                     }
 
+                    // Apply alarm logic
                     if (comparisonValue !== 0) {
                         const deviation = Math.abs(currentValue - comparisonValue) / comparisonValue;
                         if (deviation > deviationThreshold) {
                             errors[currentMonth] = true;
                         }
-                    } else if (checkZeroError && currentValue > 0) {
+                    } else if (checkZeroError && currentValue > 0) { // This handles the index reset case
                         errors[currentMonth] = true;
                     }
                 }
@@ -232,7 +240,7 @@
             });
         };
 
-        const TableComponent = ({ data, handleSelectMeter, selectedMeter, displayedFields, checkedRows, handleCheckboxChange, handleSelectAllChange }) => {
+        const TableComponent = ({ data, editing, setEditing, editValue, setEditValue, handleUpdate, handleSelectMeter, selectedMeter, displayedFields, checkedRows, handleCheckboxChange, handleSelectAllChange }) => {
             const stickyColumnCount = 2;
 
             const columnWidths = useMemo(() => {
@@ -329,7 +337,9 @@
                                         const { left } = columnWidths[cellIndex];
 
                                         let baseBgColor;
-                                        if (record.errors[fieldName]) {
+                                        if(editing.recordId === record.id && editing.field === fieldName) {
+                                            baseBgColor = 'var(--bg-hover)';
+                                        } else if (record.errors[fieldName]) {
                                             baseBgColor = 'var(--accent-red)';
                                         } else if (fieldName === 'Customer/ General meter' && record.hasErrors) {
                                             baseBgColor = 'var(--error-bg-light)';
@@ -369,8 +379,20 @@
                                         }
 
                                         return (
-                                            <td key={cellIndex} style={tdStyle}>
-                                                {fieldValue}
+                                            <td key={cellIndex} style={tdStyle} onDoubleClick={() => {
+                                                if (isConsumption) return; // Consumption is not editable
+                                                setEditing({ recordId: record.id, field: fieldName });
+                                                setEditValue(fieldValue);
+                                            }}>
+                                                {editing.recordId === record.id && editing.field === fieldName && !isConsumption ? (
+                                                    <input type={ALL_MONTHS.includes(fieldName) ? "number" : "text"} value={editValue} onChange={(e) => setEditValue(e.target.value)} onBlur={() => handleUpdate(record.id, fieldName)}
+                                                        onKeyDown={(e) => {
+                                                            if (e.key === 'Enter') handleUpdate(record.id, fieldName);
+                                                            if (e.key === 'Escape') setEditing({});
+                                                        }}
+                                                        style={{ width: '100%', boxSizing: 'border-box', padding: '4px', borderRadius: '4px', border: '1px solid var(--accent-blue)', textAlign: 'center' }} autoFocus
+                                                    />
+                                                ) : ( fieldValue )}
                                             </td>
                                         );
                                     })}
@@ -474,12 +496,14 @@
             )
         };
 
-        // The App now accepts 'initialRecords' as a prop
-        function App({ initialRecords }) {
+        function App() {
             const [data, setData] = useState([]);
             const [loading, setLoading] = useState(true);
             const [error, setError] = useState(null);
+            const [editError, setEditError] = useState(null);
             const [filters, setFilters] = useState({ customer: '', serialNumber: '', meterType: '', location: '', year: ['2025'], month: '' });
+            const [editing, setEditing] = useState({});
+            const [editValue, setEditValue] = useState('');
             const [selectedMeter, setSelectedMeter] = useState(null);
             const [checkedRows, setCheckedRows] = useState([]);
             const [showHelpModal, setShowHelpModal] = useState(false);
@@ -494,19 +518,28 @@
 
             const years = useMemo(() => Array.from(new Set(ALL_MONTHS.map(month => month.split(' ')[1]))).sort(), []);
 
-            // Data is now processed from the prop, not fetched.
-            useEffect(() => {
-                if (initialRecords) {
-                    setLoading(true);
-                    originalDataRef.current = initialRecords;
-                    const analyzedRecords = analyzeData(initialRecords, alarmThreshold, checkZeroIndexError, useYearOverYear);
+            const fetchData = useCallback(async () => {
+                setLoading(true);
+                setError(null);
+                try {
+                    const response = await fetch(PROXY_ENDPOINT, { method: 'GET', headers: PROXY_HEADERS });
+                    if (!response.ok) {
+                        const errorBody = await response.json();
+                        throw new Error(errorBody.error || `HTTP error! status: ${response.status}`);
+                    }
+                    const result = await response.json();
+                    originalDataRef.current = result.records;
+                    const analyzedRecords = analyzeData(result.records, alarmThreshold, checkZeroIndexError, useYearOverYear);
                     setData(analyzedRecords);
-                    setLoading(false);
-                } else {
-                    setError("Data not provided. Please configure data source in Softr.");
+                } catch (e) {
+                    console.error("Failed to fetch data via proxy:", e);
+                    setError(`Failed to load data: ${e.message}`);
+                } finally {
                     setLoading(false);
                 }
-            }, [initialRecords, alarmThreshold, checkZeroIndexError, useYearOverYear]);
+            }, [alarmThreshold, checkZeroIndexError, useYearOverYear]);
+
+            useEffect(() => { fetchData(); }, [fetchData]);
 
             const handleSaveAlarmSettings = () => {
                 const newThreshold = parseInt(tempAlarmThreshold, 10);
@@ -514,15 +547,56 @@
                     setAlarmThreshold(newThreshold);
                     setCheckZeroIndexError(tempCheckZeroIndexError);
                     setUseYearOverYear(tempUseYearOverYear);
-                    // Re-analyze data with new settings
                     const reAnalyzedData = analyzeData(originalDataRef.current, newThreshold, tempCheckZeroIndexError, tempUseYearOverYear);
                     setData(reAnalyzedData);
                     setShowAlarmModal(false);
                 }
             };
 
-            // handleUpdate function has been removed for security.
-            // In-line editing must be handled by Softr's native features.
+
+            const handleUpdate = async (recordId, field) => {
+                setEditError(null);
+                let finalValue = editValue;
+                if (ALL_MONTHS.includes(field)) {
+                    const numericValue = parseFloat(editValue);
+                    if (isNaN(numericValue) || numericValue < 0) {
+                        setEditError('Please enter a valid positive number.');
+                        setTimeout(() => setEditError(null), 3000);
+                        return setEditing({});
+                    }
+                    finalValue = numericValue;
+                }
+                try {
+                    const payload = { records: [{ id: recordId, fields: { [field]: finalValue } }] };
+                    const response = await fetch(PROXY_ENDPOINT, { method: 'PATCH', headers: PROXY_HEADERS, body: JSON.stringify(payload) });
+
+                    if (!response.ok) {
+                        const errorBody = await response.json();
+                        throw new Error(errorBody.error || `HTTP error! status: ${response.status}`);
+                    }
+
+                    const result = await response.json();
+                    const updatedAirtableRecord = result.records[0];
+
+                    originalDataRef.current = originalDataRef.current.map(r => r.id === recordId ? updatedAirtableRecord : r);
+
+                    setData(prevData => {
+                        const updatedAnalyzedRecord = analyzeData([updatedAirtableRecord], alarmThreshold, checkZeroIndexError, useYearOverYear)[0];
+                        const newData = prevData.map(r => r.id === updatedAnalyzedRecord.id ? updatedAnalyzedRecord : r);
+                        if (selectedMeter && selectedMeter.id === updatedAnalyzedRecord.id) {
+                            setSelectedMeter(updatedAnalyzedRecord);
+                        }
+                        return newData;
+                    });
+
+                } catch (e) {
+                    console.error("Failed to update record via proxy:", e);
+                    setEditError(`Update failed: ${e.message}`);
+                    setTimeout(() => setEditError(null), 3000);
+                } finally {
+                    setEditing({});
+                }
+            };
 
             const handleSelectMeter = (record) => setSelectedMeter(record);
             const handleCheckboxChange = (recordId) => {
@@ -580,7 +654,8 @@
 
             const exportToExcel = async () => {
                 if (typeof XlsxPopulate === 'undefined') {
-                    alert("Export library is not available.");
+                    setEditError("Librăria de export nu s-a încărcat.");
+                    setTimeout(() => setEditError(null), 3000);
                     return;
                 }
 
@@ -630,7 +705,8 @@
                     URL.revokeObjectURL(url);
                 } catch (err) {
                     console.error("Error exporting to XLSX:", err);
-                    alert("Export failed.");
+                    setEditError("Exportul a eșuat.");
+                    setTimeout(() => setEditError(null), 3000);
                 }
             };
 
@@ -657,24 +733,25 @@
             if (loading) return (
                 <div className="loader-container">
                     <div className="spinner"></div>
-                    <p>Loading and processing data...</p>
+                    <p>Loading data ...</p>
                 </div>
             );
             if (error) return <div style={{color: 'red', padding: '2rem', textAlign: 'center'}}>{error}</div>;
 
             return (
-                <div className="monitoring-dashboard-container" style={{ height: '100%', display: 'flex', flexDirection: 'column', gap: '16px', padding: '16px', boxSizing: 'border-box' }}>
+                <div style={{ height: '100%', display: 'flex', flexDirection: 'column', gap: '16px', padding: '16px', boxSizing: 'border-box' }}>
                     {showHelpModal && (
                         <div className="modal-overlay" onClick={() => setShowHelpModal(false)}>
                             <div className="modal-content" onClick={e => e.stopPropagation()}>
                                 <button className="close-button" onClick={() => setShowHelpModal(false)}>&times;</button>
                                 <h2>How to Use This Application</h2>
                                 <ul>
-                                    <li><strong>Filtering Data:</strong> Use the dropdowns and checkboxes to filter the table data.</li>
-                                    <li><strong>Editing Data:</strong> Editing has been disabled in this view-only version. Data must be edited directly in Airtable or through a secure form in Softr.</li>
-                                    <li><strong>Error Highlighting:</strong> Errors are highlighted in red based on the rules in 'Alarm Settings'.</li>
-                                    <li><strong>Viewing Charts:</strong> Click the checkbox in the first column for any meter to display its annual consumption chart.</li>
-                                    <li><strong>Exporting Data:</strong> Click "Export to Excel" to download the currently filtered data.</li>
+                                    <li><strong>Filtering Data:</strong> Use the dropdowns and checkboxes to filter the table data. You can filter by customer, serial number, meter type, location, and year or a specific month.</li>
+                                    <li><strong>Editing Data:</strong> Double-click on any cell (Customer, Serial, Type, Location, or monthly index) to edit its value. Press `Enter` to save or `Esc` to cancel.</li>
+                                    <li><strong>Error Highlighting:</strong> Errors are highlighted in red. You can configure three types of alarms in 'Alarm Settings': high deviation, index resets, and seasonal fluctuations.</li>
+                                    <li><strong>Viewing Charts:</strong> Click the checkbox (📈) in the first column for any meter to display its annual consumption chart. The chart shows the monthly consumption.</li>
+                                    <li><strong>Select All:</strong> Click the checkbox in the table header to select or deselect all currently visible meters.</li>
+                                    <li><strong>Exporting Data:</strong> Click the "Export to Excel" button to download the currently filtered data as a CSV file, which can be opened in Excel.</li>
                                 </ul>
                             </div>
                         </div>
@@ -694,25 +771,35 @@
                                         style={{width: '100px', padding: '8px', borderRadius: '4px', border: '1px solid #ccc'}}
                                     />
                                     <p style={{fontSize: '0.875rem', color: '#666', marginTop: '10px'}}>
-                                        Flags an error if consumption deviates from the comparison month by more than this percentage.
+                                        Set the percentage for consumption deviation. An error will be flagged if the consumption of a month deviates from the comparison month by more than this percentage.
                                     </p>
                                 </div>
                                 <div style={{marginTop: '20px', borderTop: '1px solid #eee', paddingTop: '20px'}}>
                                      <label className="checkbox-label" style={{justifyContent: 'flex-start'}}>
-                                        <input type="checkbox" className="checkbox-input" checked={tempCheckZeroIndexError} onChange={(e) => setTempCheckZeroIndexError(e.target.checked)} />
+                                        <input
+                                            type="checkbox"
+                                            className="checkbox-input"
+                                            checked={tempCheckZeroIndexError}
+                                            onChange={(e) => setTempCheckZeroIndexError(e.target.checked)}
+                                        />
                                         Flag error on index reset
                                     </label>
                                     <p style={{fontSize: '0.875rem', color: '#666', marginTop: '10px'}}>
-                                        Flags an error when a meter's index goes from 0 to a positive value.
+                                        Enable this to flag an error when a meter's index goes from 0 to a positive value. This is useful for detecting when a meter starts recording after being reset or newly installed.
                                     </p>
                                 </div>
                                 <div style={{marginTop: '20px', borderTop: '1px solid #eee', paddingTop: '20px'}}>
                                      <label className="checkbox-label" style={{justifyContent: 'flex-start'}}>
-                                        <input type="checkbox" className="checkbox-input" checked={tempUseYearOverYear} onChange={(e) => setTempUseYearOverYear(e.target.checked)} />
-                                        Use year-over-year comparison
+                                        <input
+                                            type="checkbox"
+                                            className="checkbox-input"
+                                            checked={tempUseYearOverYear}
+                                            onChange={(e) => setTempUseYearOverYear(e.target.checked)}
+                                        />
+                                        Use year-over-year comparison for deviation
                                     </label>
                                     <p style={{fontSize: '0.875rem', color: '#666', marginTop: '10px'}}>
-                                        Compares consumption to the same month of the previous year to handle seasonal fluctuations.
+                                        Helps manage seasonal fluctuations (e.g., higher gas consumption in winter). It compares consumption to the same month of the previous year. Falls back to month-over-month for the first year of data.
                                     </p>
                                 </div>
                                 <div style={{marginTop: '30px', display: 'flex', justifyContent: 'flex-end', gap: '10px'}}>
@@ -731,6 +818,7 @@
                                 <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem', marginTop: '4px', margin: 0 }}>View and manage consumption data.</p>
                             </div>
                             <div style={{display: 'flex', gap: '10px', alignItems: 'center'}}>
+                                {editError && <div style={{ backgroundColor: 'var(--accent-red)', color: 'white', padding: '8px 12px', borderRadius: '8px', fontSize: '0.875rem' }}>{editError}</div>}
                                 <button className="action-button" onClick={() => { setTempAlarmThreshold(alarmThreshold); setTempCheckZeroIndexError(checkZeroIndexError); setTempUseYearOverYear(useYearOverYear); setShowAlarmModal(true); }}>Alarm Settings</button>
                                 <button className="action-button" onClick={() => setShowHelpModal(true)}>How to Use</button>
                                 <button className="action-button" onClick={exportToExcel}>Export to Excel</button>
@@ -795,34 +883,12 @@
                         </div>
                     )}
 
-                    <TableComponent data={filteredData} handleSelectMeter={handleSelectMeter} selectedMeter={selectedMeter} displayedFields={displayedFields} checkedRows={checkedRows} handleCheckboxChange={handleCheckboxChange} handleSelectAllChange={handleSelectAllChange} />
+                    <TableComponent data={filteredData} editing={editing} setEditing={setEditing} editValue={editValue} setEditValue={setEditValue} handleUpdate={handleUpdate} handleSelectMeter={handleSelectMeter} selectedMeter={selectedMeter} displayedFields={displayedFields} checkedRows={checkedRows} handleCheckboxChange={handleCheckboxChange} handleSelectAllChange={handleSelectAllChange} />
                 </div>
             );
         }
 
-        // --- Softr Integration ---
-        // This function will be called by Softr to initialize the application.
-        // It expects the Airtable records to be available on the window object.
-        function initializeDashboard(records) {
-             ReactDOM.render(
-                <App initialRecords={records} />,
-                document.getElementById('monitoring-dashboard-root')
-            );
-        }
-
-        // Example of how to pass data from Softr.
-        // In your Softr Custom Code block, you will need to make sure `window.airtableRecords`
-        // is populated with your data before this script runs.
-        // For example:
-        // <script>
-        //   window.airtableRecords = {records}; // '{records}' is a placeholder for Softr's data variable
-        // </script>
-        //
-        // Then, you can call initializeDashboard(window.airtableRecords)
-
-        // For testing purposes, you can uncomment the line below and replace with sample data.
-        // initializeDashboard([{ id: 'rec1', fields: { 'Customer/ General meter': 'Test' } }]);
-
+        ReactDOM.render(<App />, document.getElementById('root'));
     </script>
 </body>
 </html>
